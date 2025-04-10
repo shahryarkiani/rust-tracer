@@ -44,69 +44,21 @@ fn create_bmp_header(width: u32, height: u32) -> [u8; 54] {
 
     let mut bmp_header = [0u8; 54];
 
-    let mut idx = 0;
-
-    // TODO: Implement better method for creating header
-    for data in bmp_signature.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in bmp_file_size.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in bmp_reserved.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in bmp_data_offset.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_size.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_width.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_height.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_planes.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_bits_per_pixel.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_compression.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_image_size.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_x_pixels_per_m.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_y_pixels_per_m.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_colors_used.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
-    for data in info_header_important_colors.to_le_bytes() {
-        bmp_header[idx] = data;
-        idx += 1;
-    }
+    bmp_header[0..2].copy_from_slice(&bmp_signature.to_le_bytes());
+    bmp_header[2..6].copy_from_slice(&bmp_file_size.to_le_bytes());
+    bmp_header[6..10].copy_from_slice(&bmp_reserved.to_le_bytes());
+    bmp_header[10..14].copy_from_slice(&bmp_data_offset.to_le_bytes());
+    bmp_header[14..18].copy_from_slice(&info_header_size.to_le_bytes());
+    bmp_header[18..22].copy_from_slice(&info_header_width.to_le_bytes());
+    bmp_header[22..26].copy_from_slice(&info_header_height.to_le_bytes());
+    bmp_header[26..28].copy_from_slice(&info_header_planes.to_le_bytes());
+    bmp_header[28..30].copy_from_slice(&info_header_bits_per_pixel.to_le_bytes());
+    bmp_header[30..34].copy_from_slice(&info_header_compression.to_le_bytes());
+    bmp_header[34..38].copy_from_slice(&info_header_image_size.to_le_bytes());
+    bmp_header[38..42].copy_from_slice(&info_header_x_pixels_per_m.to_le_bytes());
+    bmp_header[42..46].copy_from_slice(&info_header_y_pixels_per_m.to_le_bytes());
+    bmp_header[46..50].copy_from_slice(&info_header_colors_used.to_le_bytes());
+    bmp_header[50..54].copy_from_slice(&info_header_important_colors.to_le_bytes());
 
     bmp_header
 }
