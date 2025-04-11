@@ -1,22 +1,31 @@
 use std::io;
 
+use bmp::BmpCanvas;
+use canvas::{Canvas, Pixel};
+
 mod bmp;
+mod canvas;
 
 fn main() -> Result<(), io::Error>{
-    let height: u32 = 64;
-    let width: u32 = 64;
-    assert!(width % 4 == 0);
+    let height: u32 = 27 * 6;
+    let width: u32 = 33 * 6;
 
-    let image_size: usize = (height * width * 3) as usize;
+    let mut bmp_canvas = BmpCanvas::new(width, height);
 
-    let mut image_data = vec![0u8; image_size];
-
-
-    for i in 0..image_data.len() {
-        image_data[i] = (i * (257 * i % 3)) as u8;
+    for y in 0..height {
+        for x in 0..width {
+            let pixel = Pixel {
+                b: (x ^ y) as u8,
+                g: ((x + y) ^ (x * y)) as u8,
+                r: ((x + y) ^ (x / (y + 1))) as u8
+            };
+            bmp_canvas.set_pixel(x, y, pixel);
+        }
     }
 
-    bmp::save_image("examples/test.bmp", width, height, image_data)?;
+    bmp_canvas.set_pixel(2, 2, Pixel{b:255, g:255, r:255});
+
+    bmp_canvas.save_image("examples/test.bmp")?;
     
     Ok(())
 }
