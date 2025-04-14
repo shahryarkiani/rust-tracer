@@ -6,6 +6,8 @@ use canvas::{Canvas, Pixel};
 mod bmp;
 mod canvas;
 mod vec3;
+mod ray;
+mod raytracer;
 
 fn main() -> Result<(), io::Error>{
     let height: u32 = 27 * 6;
