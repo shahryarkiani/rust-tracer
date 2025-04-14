@@ -2,29 +2,24 @@ use std::io;
 
 use bmp::BmpCanvas;
 use canvas::{Canvas, Pixel};
+use raytracer::RayTracer;
 
 mod bmp;
 mod canvas;
 mod vec3;
 mod ray;
 mod raytracer;
+mod sphere;
 
 fn main() -> Result<(), io::Error>{
-    let height: u32 = 27 * 6;
-    let width: u32 = 33 * 6;
+    let height: u32 = 510;
+    let width: u32 = 800;
 
     let mut bmp_canvas = BmpCanvas::new(width, height);
 
-    for y in 0..height {
-        for x in 0..width {
-            let pixel = Pixel {
-                b: (x ^ y) as u8,
-                g: ((x + y) ^ (x * y)) as u8,
-                r: ((x + y) ^ (x / (y + 1))) as u8
-            };
-            bmp_canvas.set_pixel(x, y, pixel);
-        }
-    }
+    let raytracer = RayTracer::new(&bmp_canvas, 2.0, 1.0);
+
+    raytracer.draw(&mut bmp_canvas);
 
     bmp_canvas.set_pixel(2, 2, Pixel{b:255, g:255, r:255});
 

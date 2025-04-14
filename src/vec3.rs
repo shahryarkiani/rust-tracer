@@ -95,7 +95,7 @@ impl Div<f64> for Vec3 {
         Vec3 {
             x: self.x / c,
             y: self.y / c,
-            z: self.y / c
+            z: self.z / c
         }
     } 
 }

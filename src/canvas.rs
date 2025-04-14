@@ -5,6 +5,14 @@ pub struct Pixel {
     pub r: u8
 }
 
+pub type Color = Pixel;
+
+impl Pixel {
+    pub fn new(r: u8, g: u8, b:u8) -> Pixel {
+        Pixel {b, g, r}
+    }
+}
+
 pub trait Canvas{
     fn set_pixel(&mut self, x: u32, y: u32, pixel: Pixel);
     fn get_pixel(&self, x: u32, y:u32) -> Pixel; 
