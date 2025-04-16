@@ -56,7 +56,6 @@ impl RayTracer {
                     let cosine = norm_u.dot(light_u);
 
                     let angle_proportion = (f64::acos(cosine)) / PI;
-                    println!("{}", angle_proportion);
                     let color = Color::new((255.0 * angle_proportion) as u8, (255.0 * angle_proportion) as u8, 0);
 
                     canvas.set_pixel(x, y, color);
