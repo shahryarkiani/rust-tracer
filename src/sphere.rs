@@ -14,13 +14,17 @@ impl Sphere {
         Sphere {center, radius, color}
     }
 
-    pub fn intersects(&self, ray: Ray) -> bool {
+    pub fn intersects(&self, ray: Ray) -> f64 {
         let diff = self.center - ray.origin();
         let a = ray.dir().dot(ray.dir());
         let b = -2.0 * ray.dir().dot(diff);
         let c= diff.dot(diff) - self.radius * self.radius;
         let discriminant = b * b - 4.0 * a * c;
-        discriminant >= 0.0
+        if discriminant >= 0.0 {
+            (-b - f64::sqrt(discriminant)) / (2.0 * a) 
+        } else {
+            -1.0
+        }
     }
 
     pub fn color(&self) -> Color {
