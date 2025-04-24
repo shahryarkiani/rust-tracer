@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use crate::{canvas::{Canvas, Color}, ray::{Point3, Ray}, sphere::Sphere, vec3::Vec3};
+use crate::{canvas::{Canvas, Color}, hittable::{self, Hittable}, ray::{Point3, Ray}, sphere::Sphere, vec3::Vec3};
 
 
 
@@ -26,7 +26,7 @@ impl RayTracer {
     }
 
 
-    pub fn draw(&self, canvas: &mut impl Canvas) {
+    pub fn draw(&self, canvas: &mut impl Canvas, world: &impl Hittable) {
         
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
         let y_viewport = Vec3::new(0.0, self.viewport_height, 0.0);
