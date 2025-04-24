@@ -10,6 +10,7 @@ mod vec3;
 mod ray;
 mod raytracer;
 mod sphere;
+mod hittable;
 
 fn main() -> Result<(), io::Error>{
     let height: u32 = 510;

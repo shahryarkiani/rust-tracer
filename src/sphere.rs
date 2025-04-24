@@ -1,4 +1,4 @@
-use crate::{canvas::Color, ray::{Point3, Ray}};
+use crate::{canvas::Color, ray::{Point3, Ray}, hittable::Hittable};
 
 
 
@@ -29,6 +29,12 @@ impl Sphere {
 
     pub fn color(&self) -> Color {
         self.color
+    }
+}
+
+impl Hittable for Sphere {
+    fn hit(&self, ray: Ray, hit_info_out : &mut crate::hittable::HitInfo) -> bool {
+        todo!()
     }
 }
 
