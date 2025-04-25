@@ -1,11 +1,11 @@
+use crate::vec3::Vec3;
+
 #[derive(Clone, Copy, Debug)]
 pub struct Pixel {
     pub b: u8,
     pub g: u8,
     pub r: u8
 }
-
-pub type Color = Pixel;
 
 impl Pixel {
     pub fn new(r: u8, g: u8, b:u8) -> Pixel {
@@ -18,6 +18,10 @@ pub trait Canvas{
     fn get_pixel(&self, x: u32, y:u32) -> Pixel; 
     fn height(&self) -> u32;
     fn width(&self) -> u32;
+}
+
+pub fn to_pixel(color_vec : Vec3) -> Pixel {
+    Pixel { b: (255.999 * color_vec.z) as u8, g: (255.999 * color_vec.y) as u8, r: (255.999 * color_vec.x) as u8 }
 }
 
 
