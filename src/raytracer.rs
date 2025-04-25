@@ -1,6 +1,5 @@
-use std::f64::consts::PI;
 
-use crate::{canvas::{Canvas, Color}, hittable::{self, Hittable}, ray::{Point3, Ray}, sphere::Sphere, vec3::Vec3};
+use crate::{canvas::{to_pixel, Canvas, Pixel}, hittable::{HitInfo, Hittable}, ray::{Interval, Point3, Ray}, vec3::Vec3};
 
 
 
@@ -35,32 +34,21 @@ impl RayTracer {
 
         let viewport_top_left= self.camera_pos - Point3::new(0.0, 0.0, self.focal_len) - x_viewport / 2.0 -  y_viewport / 2.0 + x_delta / 2.0 + y_delta / 2.0;
         
-        let sphere_center = Point3::new(0.0, 0.0, -1.0);
-        let sphere = Sphere::new(sphere_center, 0.5, Color::new(125,125,0));
 
-        let point_light = Point3::new(0.0, 0.0, 0.0);
+        let mut hit_info: HitInfo = HitInfo::default();
 
         for y in 0..canvas.height() {
             for x in 0..canvas.width() {
                 let dir = viewport_top_left + (x_delta * x as f64) + (y_delta * y as f64);
                 let ray = Ray::new(self.camera_pos, dir);
-                let intersection_t = sphere.intersects(ray);
-                if intersection_t >= 0.0 {
-                    let intersection_point = ray.at(intersection_t);
-                    let norm = intersection_point - sphere_center;
-                    let norm_u = norm / norm.magnitude();
 
-                    let light_path = intersection_point - point_light;
-                    let light_u = light_path / light_path.magnitude();
 
-                    let cosine = norm_u.dot(light_u);
+                if world.hit(ray, Interval::new(0.0, f64::INFINITY), &mut hit_info) {
+                    let color = 0.5 * (hit_info.color + Vec3 { x: 1.0, y: 1.0, z: 1.0 });
 
-                    let angle_proportion = (f64::acos(cosine)) / PI;
-                    let color = Color::new((255.0 * angle_proportion) as u8, (255.0 * angle_proportion) as u8, 0);
-
-                    canvas.set_pixel(x, y, color);
+                    canvas.set_pixel(x, y, to_pixel(color));
                 } else {
-                    canvas.set_pixel(x, y, Color::new(135 , 200,255));
+                    canvas.set_pixel(x, y, Pixel::new(135 , 200,255));
                 }
 
             }
