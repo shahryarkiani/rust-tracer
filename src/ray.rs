@@ -44,11 +44,11 @@ impl Interval {
     }
 }
 
-pub const empty: Interval = Interval {
+pub const EMPTY: Interval = Interval {
     begin: f64::INFINITY,
     end: f64::NEG_INFINITY,
 };
-pub const any: Interval = Interval {
+pub const ANY: Interval = Interval {
     begin: f64::NEG_INFINITY,
     end: f64::INFINITY,
 };
