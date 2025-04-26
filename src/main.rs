@@ -16,8 +16,9 @@ mod sphere;
 mod hittable;
 
 fn main() -> Result<(), io::Error>{
-    let height: u32 = 510;
     let width: u32 = 800;
+    let aspect_ratio = 16.0 / 9.0;
+    let height: u32 = (width as f64 / aspect_ratio) as u32;
 
     let mut bmp_canvas = BmpCanvas::new(width, height);
     let mut world = HittableList::default();
@@ -26,7 +27,7 @@ fn main() -> Result<(), io::Error>{
 
     world.add(sphere);
 
-    sphere = Sphere::new(Point3::new(1.35, 1.0, -2.0), 0.75, Vec3::new(0.5, 0.22, 0.5));
+    sphere = Sphere::new(Point3::new(0., -100.5, -1.), 100., Vec3::new(0.5, 0.22, 0.5));
     world.add(sphere);
 
 
