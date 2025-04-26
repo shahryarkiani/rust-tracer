@@ -42,6 +42,16 @@ impl Interval {
     pub fn contains(&self, t: f64) -> bool {
         t >= self.begin && t <= self.end
     }
+
+    pub fn clamp(&self, t: f64) -> f64 {
+        if t > self.end {
+            return self.end;
+        } else if t < self.begin {
+            return self.begin;
+        }
+
+        t
+    }
 }
 
 pub const EMPTY: Interval = Interval {
