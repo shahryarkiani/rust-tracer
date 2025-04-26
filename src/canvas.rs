@@ -22,9 +22,18 @@ pub trait Canvas {
 
 pub fn to_pixel(color_vec: Vec3) -> Pixel {
     let intensity = Interval::new(0.0, 0.999);
-    Pixel {
-        b: (256.0 * intensity.clamp(color_vec.z)) as u8,
-        g: (256.0 * intensity.clamp(color_vec.y)) as u8,
-        r: (256.0 * intensity.clamp(color_vec.x)) as u8,
+
+    let r = (256.0 * intensity.clamp(linear_to_gamma(color_vec.x))) as u8;
+    let g = (256.0 * intensity.clamp(linear_to_gamma(color_vec.y))) as u8;
+    let b = (256.0 * intensity.clamp(linear_to_gamma(color_vec.z))) as u8;
+
+    Pixel { r, g, b }
+}
+
+fn linear_to_gamma(intensity: f64) -> f64 {
+    if intensity > 0.0 {
+        return f64::sqrt(intensity);
     }
+
+    0.0
 }
