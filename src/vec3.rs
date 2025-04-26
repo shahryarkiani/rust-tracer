@@ -21,12 +21,23 @@ impl Vec3 {
         }
     }
 
-    pub fn random_clamped(min: f64, max: f64) -> Vec3 {
+    pub fn random_range(min: f64, max: f64) -> Vec3 {
         Vec3 {
             x: rand::rng().random_range(min..max),
             y: rand::rng().random_range(min..max),
             z: rand::rng().random_range(min..max),
         }
+    }
+
+    pub fn random_unit() -> Vec3 {
+        let vec = Vec3::random_range(-1., 1.);
+        let mag_squared = vec.dot(vec);
+
+        if 1e-160 < mag_squared && mag_squared <= 1. {
+            return vec / f64::sqrt(mag_squared);
+        }
+
+        vec
     }
 
     pub fn magnitude(&self) -> f64 {
