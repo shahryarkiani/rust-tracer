@@ -6,15 +6,13 @@ use crate::{
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    color: Vec3,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64, color: Vec3) -> Sphere {
+    pub fn new(center: Point3, radius: f64) -> Sphere {
         Sphere {
             center,
             radius,
-            color,
         }
     }
 
@@ -22,9 +20,6 @@ impl Sphere {
         (point - self.center) / self.radius
     }
 
-    pub fn color(&self) -> Vec3 {
-        self.color
-    }
 }
 
 impl Hittable for Sphere {

@@ -111,6 +111,17 @@ impl Mul<Vec3> for f64 {
     }
 }
 
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    fn mul(self, vec: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x * vec.x,
+            y: self.y * vec.y,
+            z: self.z * vec.z,
+        }
+    }
+}
+
 impl Div<f64> for Vec3 {
     type Output = Vec3;
     fn div(self, c: f64) -> Vec3 {

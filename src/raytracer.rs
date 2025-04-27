@@ -48,7 +48,7 @@ impl RayTracer {
     }
 }
 
-fn ray_color(ray: Ray, world: &impl Hittable, rec_depth: i16) -> Vec3 {
+fn ray_color(ray: Ray, world: &HittableList, rec_depth: i16) -> Vec3 {
     if rec_depth == 0 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
@@ -56,12 +56,17 @@ fn ray_color(ray: Ray, world: &impl Hittable, rec_depth: i16) -> Vec3 {
     let mut hit_info = HitInfo::default();
 
     if world.hit(ray, Interval::new(0.001, f64::INFINITY), &mut hit_info) {
-        let normal = hit_info.normal;
-        let bounce_dir = Vec3::random_unit() + normal;
+        // Get the material based on the material id
+        let material = world.material_for_id(hit_info.material_id);
 
-        let origin = ray.at(hit_info.t);
+        let mut scattered_ray: Ray = Ray::default();
+        let mut attenuation: Vec3 = Vec3::default();
 
-        return 0.5 * ray_color(Ray::new(origin, bounce_dir), world, rec_depth - 1);
+        if material.scatter(ray, &hit_info, &mut attenuation, &mut scattered_ray) {
+            return attenuation * ray_color(scattered_ray, world, rec_depth - 1);
+        }
+
+        return Vec3::new(0.0, 0.0, 0.0);
     }
     
     let dir_u = ray.dir() / ray.dir().magnitude();
