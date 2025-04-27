@@ -41,7 +41,7 @@ impl BmpCanvas {
 
 impl Canvas for BmpCanvas {
     fn set_pixel(&mut self, x: u32, y: u32, pixel: Pixel) {
-        let idx = ((y * self.scanline_size) + x * 3) as usize;
+        let idx = (((self.height - 1 - y) * self.scanline_size) + x * 3) as usize;
 
         self.pixels[idx] = pixel.b;
         self.pixels[idx + 1] = pixel.g;

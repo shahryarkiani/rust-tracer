@@ -30,12 +30,11 @@ impl RayTracer {
     pub fn draw(&self, canvas: &mut impl Canvas, world: &HittableList, samples: i32) {
         
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
-        let y_viewport = Vec3::new(0.0, self.viewport_height, 0.0);
+        let y_viewport = Vec3::new(0.0, -self.viewport_height, 0.0);
         let x_delta = x_viewport / canvas.width() as f64;
         let y_delta =  y_viewport / canvas.height() as f64;
 
-        let viewport_top_left= self.camera_pos - Point3::new(0.0, 0.0, self.focal_len) - x_viewport / 2.0 -  y_viewport / 2.0 + x_delta / 2.0 + y_delta / 2.0;
-
+        let viewport_top_left= self.camera_pos - Point3::new(0.0, 0.0, self.focal_len) - x_viewport / 2.0 - y_viewport / 2.0 + x_delta / 2.0 + y_delta / 2.0;
         for y in 0..canvas.height() {
             for x in 0..canvas.width() {
                 let base_dir = viewport_top_left + (x_delta * x as f64) + (y_delta * y as f64);
