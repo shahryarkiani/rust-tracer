@@ -18,7 +18,7 @@ mod hittable;
 mod material;
 
 fn main() -> Result<(), io::Error>{
-    let width: u32 = 3840;
+    let width: u32 = 400;
     let aspect_ratio = 16.0 / 9.0;
     let height: u32 = (width as f64 / aspect_ratio) as u32;
 
@@ -49,7 +49,7 @@ fn main() -> Result<(), io::Error>{
 
     let raytracer = RayTracer::new(&bmp_canvas, 2.0, 1.0);
 
-    raytracer.draw(&mut bmp_canvas, &world);
+    raytracer.draw(&mut bmp_canvas, &world, 100);
 
     bmp_canvas.save_image("examples/test.bmp")?;
     

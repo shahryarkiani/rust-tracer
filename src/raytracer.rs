@@ -1,4 +1,6 @@
 
+use rand::Rng;
+
 use crate::{canvas::{to_pixel, Canvas}, hittable::{HitInfo, Hittable, HittableList}, ray::{Interval, Point3, Ray}, vec3::Vec3};
 
 
@@ -25,7 +27,7 @@ impl RayTracer {
     }
 
 
-    pub fn draw(&self, canvas: &mut impl Canvas, world: &HittableList) {
+    pub fn draw(&self, canvas: &mut impl Canvas, world: &HittableList, samples: i32) {
         
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
         let y_viewport = Vec3::new(0.0, self.viewport_height, 0.0);
@@ -36,10 +38,22 @@ impl RayTracer {
 
         for y in 0..canvas.height() {
             for x in 0..canvas.width() {
-                let dir = viewport_top_left + (x_delta * x as f64) + (y_delta * y as f64);
-                let ray = Ray::new(self.camera_pos, dir);
+                let base_dir = viewport_top_left + (x_delta * x as f64) + (y_delta * y as f64);
 
-                let color = ray_color(ray, world, 20);
+                let mut color = Vec3::new(0., 0., 0.);
+
+                for i in 0..samples {
+                    let x_offset = rand::rng().random_range(-0.5..0.5);
+                    let y_offset = rand::rng().random_range(-0.5..0.5);
+
+                    let dir = Vec3::new(base_dir.x + x_delta.x * x_offset, base_dir.y + y_delta.y * y_offset, base_dir.z );
+
+                    let ray = Ray::new(self.camera_pos, dir);
+
+                    color = color + ray_color(ray, world, 20);
+                }
+
+                color = color / (samples as f64);
 
                 canvas.set_pixel(x, y, to_pixel(color));
 
@@ -47,6 +61,8 @@ impl RayTracer {
         }
     }
 }
+
+
 
 fn ray_color(ray: Ray, world: &HittableList, rec_depth: i16) -> Vec3 {
     if rec_depth == 0 {
