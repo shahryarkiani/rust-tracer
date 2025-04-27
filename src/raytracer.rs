@@ -41,7 +41,7 @@ impl RayTracer {
 
                 let mut color = Vec3::new(0., 0., 0.);
 
-                for i in 0..samples {
+                for _ in 0..samples {
                     let x_offset = rand::rng().random_range(-0.5..0.5);
                     let y_offset = rand::rng().random_range(-0.5..0.5);
 
