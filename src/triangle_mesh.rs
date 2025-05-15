@@ -72,7 +72,7 @@ fn triangle_hit(
 
     let t = (det - tri_normal.dot(ray.origin())) / (tri_normal.dot(ray.dir()));
 
-    if hit_info_out.t < t {
+    if hit_info_out.t < t || !interval.contains(t) {
         return false;
     }
 
