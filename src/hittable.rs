@@ -10,7 +10,7 @@ pub trait Hittable {
 
 #[derive(Default)]
 pub struct HitInfo {
-    pub t: f64,
+    pub t: f32,
     pub normal: Vec3,
     pub point: Point3,
     pub material: Material,

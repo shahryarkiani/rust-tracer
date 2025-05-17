@@ -1,5 +1,5 @@
 use crate::vec3::Vec3;
-use core::f64;
+use core::f32;
 
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Ray {
@@ -15,7 +15,7 @@ impl Ray {
         Ray { origin, dir }
     }
 
-    pub fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: f32) -> Point3 {
         return self.origin + t * self.dir;
     }
 
@@ -30,20 +30,20 @@ impl Ray {
 
 #[derive(Clone, Copy, Default)]
 pub struct Interval {
-    begin: f64,
-    end: f64,
+    begin: f32,
+    end: f32,
 }
 
 impl Interval {
-    pub fn new(begin: f64, end: f64) -> Interval {
+    pub fn new(begin: f32, end: f32) -> Interval {
         Interval { begin, end }
     }
 
-    pub fn contains(&self, t: f64) -> bool {
+    pub fn contains(&self, t: f32) -> bool {
         t >= self.begin && t <= self.end
     }
 
-    pub fn clamp(&self, t: f64) -> f64 {
+    pub fn clamp(&self, t: f32) -> f32 {
         if t > self.end {
             return self.end;
         } else if t < self.begin {
@@ -55,10 +55,10 @@ impl Interval {
 }
 
 pub const EMPTY: Interval = Interval {
-    begin: f64::INFINITY,
-    end: f64::NEG_INFINITY,
+    begin: f32::INFINITY,
+    end: f32::NEG_INFINITY,
 };
 pub const ANY: Interval = Interval {
-    begin: f64::NEG_INFINITY,
-    end: f64::INFINITY,
+    begin: f32::NEG_INFINITY,
+    end: f32::INFINITY,
 };

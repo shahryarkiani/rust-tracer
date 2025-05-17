@@ -9,15 +9,15 @@ use crate::{
 };
 
 pub struct RayTracer {
-    viewport_height: f64,
-    viewport_width: f64,
-    focal_len: f64,
+    viewport_height: f32,
+    viewport_width: f32,
+    focal_len: f32,
     camera_pos: Point3,
 }
 
 impl RayTracer {
-    pub fn new(canvas: &impl Canvas, viewport_height: f64, focal_length: f64) -> RayTracer {
-        let viewport_width = viewport_height * (canvas.width() as f64 / canvas.height() as f64);
+    pub fn new(canvas: &impl Canvas, viewport_height: f32, focal_length: f32) -> RayTracer {
+        let viewport_width = viewport_height * (canvas.width() as f32 / canvas.height() as f32);
 
         // Camera is (initially) positioned at (0, 0, 0)
         RayTracer {
@@ -31,8 +31,8 @@ impl RayTracer {
     pub fn draw(&self, canvas: &mut impl Canvas, scene: &Scene, samples: i32, max_bounces: i16) {
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
         let y_viewport = Vec3::new(0.0, -self.viewport_height, 0.0);
-        let x_delta = x_viewport / canvas.width() as f64;
-        let y_delta = y_viewport / canvas.height() as f64;
+        let x_delta = x_viewport / canvas.width() as f32;
+        let y_delta = y_viewport / canvas.height() as f32;
 
         let viewport_top_left = self.camera_pos
             - Point3::new(0.0, 0.0, self.focal_len)
@@ -42,7 +42,7 @@ impl RayTracer {
             + y_delta / 2.0;
         for y in 0..canvas.height() {
             for x in 0..canvas.width() {
-                let base_dir = viewport_top_left + (x_delta * x as f64) + (y_delta * y as f64);
+                let base_dir = viewport_top_left + (x_delta * x as f32) + (y_delta * y as f32);
 
                 let mut color = Vec3::new(0., 0., 0.);
 
@@ -61,7 +61,7 @@ impl RayTracer {
                     color = color + ray_color(ray, scene, max_bounces);
                 }
 
-                color = color / (samples as f64);
+                color = color / (samples as f32);
 
                 canvas.set_pixel(x, y, to_pixel(color));
             }
@@ -76,7 +76,7 @@ fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
 
     let mut hit_info = HitInfo::default();
 
-    if scene.hit(ray, Interval::new(0.001, f64::INFINITY), &mut hit_info) {
+    if scene.hit(ray, Interval::new(0.001, f32::INFINITY), &mut hit_info) {
         // Get the material based on the material id
         let material = &hit_info.material;
 

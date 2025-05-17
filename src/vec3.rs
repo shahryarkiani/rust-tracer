@@ -3,13 +3,13 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
     }
 
@@ -21,7 +21,7 @@ impl Vec3 {
         }
     }
 
-    pub fn random_range(min: f64, max: f64) -> Vec3 {
+    pub fn random_range(min: f32, max: f32) -> Vec3 {
         Vec3 {
             x: rand::rng().random_range(min..max),
             y: rand::rng().random_range(min..max),
@@ -34,17 +34,17 @@ impl Vec3 {
         let mag_squared = vec.dot(vec);
 
         if 1e-160 < mag_squared && mag_squared <= 1. {
-            return vec / f64::sqrt(mag_squared);
+            return vec / f32::sqrt(mag_squared);
         }
 
         vec
     }
 
-    pub fn magnitude(&self) -> f64 {
-        f64::sqrt(self.dot(*self))
+    pub fn magnitude(&self) -> f32 {
+        f32::sqrt(self.dot(*self))
     }
 
-    pub fn dot(&self, other: Vec3) -> f64 {
+    pub fn dot(&self, other: Vec3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
@@ -90,9 +90,9 @@ impl Sub for Vec3 {
     }
 }
 
-impl Mul<f64> for Vec3 {
+impl Mul<f32> for Vec3 {
     type Output = Vec3;
-    fn mul(self, c: f64) -> Vec3 {
+    fn mul(self, c: f32) -> Vec3 {
         Vec3 {
             x: self.x * c,
             y: self.y * c,
@@ -100,7 +100,7 @@ impl Mul<f64> for Vec3 {
         }
     }
 }
-impl Mul<Vec3> for f64 {
+impl Mul<Vec3> for f32 {
     type Output = Vec3;
     fn mul(self, vec: Vec3) -> Vec3 {
         Vec3 {
@@ -122,9 +122,9 @@ impl Mul<Vec3> for Vec3 {
     }
 }
 
-impl Div<f64> for Vec3 {
+impl Div<f32> for Vec3 {
     type Output = Vec3;
-    fn div(self, c: f64) -> Vec3 {
+    fn div(self, c: f32) -> Vec3 {
         Vec3 {
             x: self.x / c,
             y: self.y / c,

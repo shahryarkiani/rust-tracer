@@ -25,13 +25,13 @@ impl Scene {
 
 impl Hittable for Scene {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
-        hit_info_out.t = f64::INFINITY;
+        hit_info_out.t = f32::INFINITY;
 
         for mesh in &self.meshes {
             mesh.hit(ray, interval, hit_info_out);
         }
 
-        if hit_info_out.t < f64::INFINITY {
+        if hit_info_out.t < f32::INFINITY {
             return true;
         }
 

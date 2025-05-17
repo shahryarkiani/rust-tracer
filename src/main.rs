@@ -16,9 +16,9 @@ mod triangle_mesh;
 mod vec3;
 
 fn main() -> Result<(), io::Error> {
-    let width: u32 = 1440;
+    let width: u32 = 720;
     let aspect_ratio = 16.0 / 9.0;
-    let height: u32 = (width as f64 / aspect_ratio) as u32;
+    let height: u32 = (width as f32 / aspect_ratio) as u32;
 
     let mut bmp_canvas = BmpCanvas::new(width, height);
     let mut scene = Scene::default();
@@ -120,7 +120,7 @@ fn main() -> Result<(), io::Error> {
 
     let raytracer = RayTracer::new(&bmp_canvas, 2.0, 1.0);
 
-    raytracer.draw(&mut bmp_canvas, &scene, 50, 20);
+    raytracer.draw(&mut bmp_canvas, &scene, 5, 20);
 
     bmp_canvas.save_image("examples/test.bmp")?;
 

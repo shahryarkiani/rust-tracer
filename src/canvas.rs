@@ -24,9 +24,9 @@ pub fn to_pixel(color_vec: Vec3) -> Pixel {
     Pixel { r, g, b }
 }
 
-fn linear_to_gamma(intensity: f64) -> f64 {
+fn linear_to_gamma(intensity: f32) -> f32 {
     if intensity > 0.0 {
-        return f64::sqrt(intensity);
+        return f32::sqrt(intensity);
     }
 
     0.0
