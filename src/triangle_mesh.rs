@@ -12,6 +12,33 @@ pub struct TriangleMesh {
     material: Material,
 }
 
+#[derive(Default)]
+pub struct Scene {
+    meshes: Vec<TriangleMesh>,
+}
+
+impl Scene {
+    pub fn add_mesh(&mut self, mesh: TriangleMesh) {
+        self.meshes.push(mesh);
+    }
+}
+
+impl Hittable for Scene {
+    fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
+        hit_info_out.t = f64::INFINITY;
+
+        for mesh in &self.meshes {
+            mesh.hit(ray, interval, hit_info_out);
+        }
+
+        if hit_info_out.t < f64::INFINITY {
+            return true;
+        }
+
+        return false;
+    }
+}
+
 impl TriangleMesh {
     pub fn new(material: Material) -> TriangleMesh {
         TriangleMesh {
@@ -43,9 +70,12 @@ impl TriangleMesh {
 
 impl Hittable for TriangleMesh {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
-        hit_info_out.t = f64::INFINITY;
+        let mut hit_info_tmp = HitInfo::default();
+        hit_info_tmp.t = hit_info_out.t;
 
         let mut i: usize = 0;
+
+        let mut hit = false;
 
         while i < self.indices.len() {
             let a = self.vertices[self.indices[i] as usize];
@@ -54,11 +84,11 @@ impl Hittable for TriangleMesh {
 
             let normal = self.normals[i / 3];
 
-            triangle_hit(a, b, c, normal, ray, interval, hit_info_out);
+            hit |= triangle_hit(a, b, c, normal, ray, interval, hit_info_out);
 
             i += 3;
         }
-        if hit_info_out.t < f64::INFINITY {
+        if hit {
             hit_info_out.material = self.material;
             return true;
         }

@@ -4,7 +4,7 @@ use crate::{
     canvas::{Canvas, to_pixel},
     hittable::{HitInfo, Hittable},
     ray::{Interval, Point3, Ray},
-    triangle_mesh::TriangleMesh,
+    triangle_mesh::{Scene, TriangleMesh},
     vec3::Vec3,
 };
 
@@ -28,7 +28,7 @@ impl RayTracer {
         }
     }
 
-    pub fn draw(&self, canvas: &mut impl Canvas, world: &TriangleMesh, samples: i32) {
+    pub fn draw(&self, canvas: &mut impl Canvas, scene: &Scene, samples: i32) {
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
         let y_viewport = Vec3::new(0.0, -self.viewport_height, 0.0);
         let x_delta = x_viewport / canvas.width() as f64;
@@ -58,7 +58,7 @@ impl RayTracer {
 
                     let ray = Ray::new(self.camera_pos, dir);
 
-                    color = color + ray_color(ray, world, 20);
+                    color = color + ray_color(ray, scene, 20);
                 }
 
                 color = color / (samples as f64);
@@ -69,14 +69,14 @@ impl RayTracer {
     }
 }
 
-fn ray_color(ray: Ray, world: &TriangleMesh, rec_depth: i16) -> Vec3 {
+fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
     if rec_depth == 0 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
 
     let mut hit_info = HitInfo::default();
 
-    if world.hit(ray, Interval::new(0.001, f64::INFINITY), &mut hit_info) {
+    if scene.hit(ray, Interval::new(0.001, f64::INFINITY), &mut hit_info) {
         // Get the material based on the material id
         let material = &hit_info.material;
 
@@ -84,7 +84,7 @@ fn ray_color(ray: Ray, world: &TriangleMesh, rec_depth: i16) -> Vec3 {
         let mut attenuation: Vec3 = Vec3::default();
 
         if material.scatter(ray, &hit_info, &mut attenuation, &mut scattered_ray) {
-            return attenuation * ray_color(scattered_ray, world, rec_depth - 1);
+            return attenuation * ray_color(scattered_ray, scene, rec_depth - 1);
         }
 
         return Vec3::new(0.0, 0.0, 0.0);
