@@ -2,11 +2,13 @@ use crate::{
     hittable::{HitInfo, Hittable},
     material::Material,
     ray::{Interval, Point3, Ray},
+    vec3::Vec3,
 };
 
 pub struct TriangleMesh {
     indices: Vec<u32>,
     vertices: Vec<Point3>,
+    normals: Vec<Vec3>,
     material: Material,
 }
 
@@ -15,6 +17,7 @@ impl TriangleMesh {
         TriangleMesh {
             indices: Vec::new(),
             vertices: Vec::new(),
+            normals: Vec::new(),
             material: material,
         }
     }
@@ -27,6 +30,14 @@ impl TriangleMesh {
         self.indices.push(vertex_index_1);
         self.indices.push(vertex_index_2);
         self.indices.push(vertex_index_3);
+
+        let a = self.vertices[vertex_index_1 as usize];
+        let b = self.vertices[vertex_index_2 as usize];
+        let c = self.vertices[vertex_index_3 as usize];
+
+        let mut normal = (b - a).cross(c - a);
+        normal = normal / normal.magnitude();
+        self.normals.push(normal);
     }
 }
 
@@ -40,9 +51,12 @@ impl Hittable for TriangleMesh {
             let a = self.vertices[self.indices[i] as usize];
             let b = self.vertices[self.indices[i + 1] as usize];
             let c = self.vertices[self.indices[i + 2] as usize];
-            i += 3;
 
-            triangle_hit(a, b, c, ray, interval, hit_info_out);
+            let normal = self.normals[i / 3];
+
+            triangle_hit(a, b, c, normal, ray, interval, hit_info_out);
+
+            i += 3;
         }
         if hit_info_out.t < f64::INFINITY {
             hit_info_out.material = self.material;
@@ -57,20 +71,18 @@ fn triangle_hit(
     a: Point3,
     b: Point3,
     c: Point3,
+    normal: Vec3,
     ray: Ray,
     interval: Interval,
     hit_info_out: &mut HitInfo,
 ) -> bool {
-    let normal = (b - a).cross(c - a);
-    let tri_normal = normal / normal.magnitude();
-
-    let det = tri_normal.dot(a);
+    let det = normal.dot(a);
 
     if det <= 0.00001 {
         return false;
     }
 
-    let t = (det - tri_normal.dot(ray.origin())) / (tri_normal.dot(ray.dir()));
+    let t = (det - normal.dot(ray.origin())) / (normal.dot(ray.dir()));
 
     if hit_info_out.t < t || !interval.contains(t) {
         return false;
@@ -78,17 +90,17 @@ fn triangle_hit(
 
     let q = ray.at(t);
 
-    if ((b - a).cross(q - a)).dot(tri_normal) < 0.0 {
+    if ((b - a).cross(q - a)).dot(normal) < 0.0 {
         return false;
     }
-    if ((c - b).cross(q - b)).dot(tri_normal) < 0.0 {
+    if ((c - b).cross(q - b)).dot(normal) < 0.0 {
         return false;
     }
-    if ((a - c).cross(q - c).dot(tri_normal)) < 0.0 {
+    if ((a - c).cross(q - c).dot(normal)) < 0.0 {
         return false;
     }
 
-    hit_info_out.normal = tri_normal;
+    hit_info_out.normal = normal;
     hit_info_out.t = t;
     hit_info_out.point = q;
 
