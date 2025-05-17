@@ -70,9 +70,6 @@ impl TriangleMesh {
 
 impl Hittable for TriangleMesh {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
-        let mut hit_info_tmp = HitInfo::default();
-        hit_info_tmp.t = hit_info_out.t;
-
         let mut i: usize = 0;
 
         let mut hit = false;
@@ -108,9 +105,9 @@ fn triangle_hit(
 ) -> bool {
     let det = normal.dot(a);
 
-    if det <= 0.00001 {
-        return false;
-    }
+    // if det <= 0.00001 {
+    //     return false;
+    // }
 
     let t = (det - normal.dot(ray.origin())) / (normal.dot(ray.dir()));
 
@@ -129,8 +126,11 @@ fn triangle_hit(
     if ((a - c).cross(q - c).dot(normal)) < 0.0 {
         return false;
     }
-
-    hit_info_out.normal = normal;
+    if det < 0.0 {
+        hit_info_out.normal = -normal;
+    } else {
+        hit_info_out.normal = normal;
+    }
     hit_info_out.t = t;
     hit_info_out.point = q;
 
