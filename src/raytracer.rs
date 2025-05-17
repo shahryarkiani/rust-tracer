@@ -28,7 +28,7 @@ impl RayTracer {
         }
     }
 
-    pub fn draw(&self, canvas: &mut impl Canvas, scene: &Scene, samples: i32) {
+    pub fn draw(&self, canvas: &mut impl Canvas, scene: &Scene, samples: i32, max_bounces: i16) {
         let x_viewport = Vec3::new(self.viewport_width, 0.0, 0.0);
         let y_viewport = Vec3::new(0.0, -self.viewport_height, 0.0);
         let x_delta = x_viewport / canvas.width() as f64;
@@ -58,7 +58,7 @@ impl RayTracer {
 
                     let ray = Ray::new(self.camera_pos, dir);
 
-                    color = color + ray_color(ray, scene, 20);
+                    color = color + ray_color(ray, scene, max_bounces);
                 }
 
                 color = color / (samples as f64);

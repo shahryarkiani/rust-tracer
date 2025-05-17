@@ -2,7 +2,7 @@
 
 My implementation of a ray tracer in rust. 
 
-Geometry Support: Spheres
+Geometry Support: Triangles
 
 Material Support: Lambertians, Metals
 
@@ -15,6 +15,8 @@ Scene definition in main.rs
   - [ ] Multithreaded rendering
   - [ ] Moveable Camera
 
-# Example
+# Examples
+![example_image_1](test_2.bmp)
 
-![example_image](test.bmp)
+This is an old example, from when spheres were the only primitive
+![example_image_2](test.bmp)
