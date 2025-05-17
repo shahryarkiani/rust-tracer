@@ -103,13 +103,13 @@ fn triangle_hit(
     interval: Interval,
     hit_info_out: &mut HitInfo,
 ) -> bool {
-    let det = normal.dot(a);
+    let d = normal.dot(ray.dir());
 
-    // if det <= 0.00001 {
-    //     return false;
-    // }
+    if d == 0.0 {
+        return false;
+    }
 
-    let t = (det - normal.dot(ray.origin())) / (normal.dot(ray.dir()));
+    let t = (normal.dot(a) - normal.dot(ray.origin())) / (d);
 
     if hit_info_out.t < t || !interval.contains(t) {
         return false;
@@ -126,11 +126,12 @@ fn triangle_hit(
     if ((a - c).cross(q - c).dot(normal)) < 0.0 {
         return false;
     }
-    if det < 0.0 {
-        hit_info_out.normal = -normal;
-    } else {
+    if d < 0.0 {
         hit_info_out.normal = normal;
+    } else {
+        hit_info_out.normal = -normal;
     }
+
     hit_info_out.t = t;
     hit_info_out.point = q;
 
