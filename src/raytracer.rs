@@ -74,24 +74,49 @@ fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
 
+    let mut ray_color: Vec3;
+    let mut scattered_ray = Ray::default();
+
     let mut hit_info = HitInfo::default();
 
-    if scene.hit(ray, Interval::new(0.001, f32::INFINITY), &mut hit_info) {
-        // Get the material based on the material id
-        let material = &hit_info.material;
+    if scene.hit(ray, Interval::new(0.0, f32::INFINITY), &mut hit_info) {
+        let material = hit_info.material;
 
-        let mut scattered_ray: Ray = Ray::default();
-        let mut attenuation: Vec3 = Vec3::default();
+        let mut attenuation = Vec3::default();
 
         if material.scatter(ray, &hit_info, &mut attenuation, &mut scattered_ray) {
-            return attenuation * ray_color(scattered_ray, scene, rec_depth - 1);
+            ray_color = attenuation;
+        } else {
+            return Vec3::new(0., 0., 0.);
         }
+    } else {
+        let dir_u = ray.dir() / ray.dir().magnitude();
+        let a = 0.5 * (dir_u.y + 1.0);
 
-        return Vec3::new(0.0, 0.0, 0.0);
+        return (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0);
     }
 
-    let dir_u = ray.dir() / ray.dir().magnitude();
-    let a = 0.5 * (dir_u.y + 1.0);
+    let hit_interval = Interval::new(0.001, f32::INFINITY);
 
-    return (1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0);
+    for _ in 1..rec_depth {
+        if scene.hit(scattered_ray, hit_interval, &mut hit_info) {
+            let material = hit_info.material;
+
+            let mut attenuation = Vec3::default();
+
+            if material.scatter(ray, &hit_info, &mut attenuation, &mut scattered_ray) {
+                ray_color = attenuation * ray_color;
+            } else {
+                return Vec3::new(0., 0., 0.);
+            }
+        } else {
+            let dir_u = scattered_ray.dir() / scattered_ray.dir().magnitude();
+            let a = 0.5 * (dir_u.y + 1.0);
+
+            return ray_color
+                * ((1.0 - a) * Vec3::new(1.0, 1.0, 1.0) + a * Vec3::new(0.5, 0.7, 1.0));
+        }
+    }
+
+    return Vec3::new(0., 0., 0.);
 }
