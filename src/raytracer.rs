@@ -4,7 +4,7 @@ use crate::{
     canvas::{Canvas, to_pixel},
     hittable::{HitInfo, Hittable},
     ray::{Interval, Point3, Ray},
-    triangle_mesh::{Scene, TriangleMesh},
+    triangle_mesh::Scene,
     vec3::Vec3,
 };
 

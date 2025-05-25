@@ -1,4 +1,5 @@
 use crate::{
+    bbox::Bbox,
     hittable::{HitInfo, Hittable},
     material::Material,
     ray::{Interval, Point3, Ray},
@@ -9,6 +10,7 @@ pub struct TriangleMesh {
     indices: Vec<u32>,
     vertices: Vec<Point3>,
     normals: Vec<Vec3>,
+    bboxes: Vec<Bbox>,
     material: Material,
 }
 
@@ -45,6 +47,7 @@ impl TriangleMesh {
             indices: Vec::new(),
             vertices: Vec::new(),
             normals: Vec::new(),
+            bboxes: Vec::new(),
             material: material,
         }
     }

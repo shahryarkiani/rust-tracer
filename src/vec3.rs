@@ -40,6 +40,15 @@ impl Vec3 {
         vec
     }
 
+    pub fn axis_val(&self, i: usize) -> f32 {
+        match i {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => self.x,
+        }
+    }
+
     pub fn magnitude(&self) -> f32 {
         f32::sqrt(self.dot(*self))
     }

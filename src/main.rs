@@ -6,6 +6,7 @@ use raytracer::RayTracer;
 use triangle_mesh::{Scene, TriangleMesh};
 use vec3::Vec3;
 
+mod bbox;
 mod bmp;
 mod canvas;
 mod hittable;
@@ -16,7 +17,7 @@ mod triangle_mesh;
 mod vec3;
 
 fn main() -> Result<(), io::Error> {
-    let width: u32 = 720;
+    let width: u32 = 2560;
     let aspect_ratio = 16.0 / 9.0;
     let height: u32 = (width as f32 / aspect_ratio) as u32;
 
@@ -120,7 +121,7 @@ fn main() -> Result<(), io::Error> {
 
     let raytracer = RayTracer::new(&bmp_canvas, 2.0, 1.0);
 
-    raytracer.draw(&mut bmp_canvas, &scene, 5, 20);
+    raytracer.draw(&mut bmp_canvas, &scene, 25, 20);
 
     bmp_canvas.save_image("examples/test.bmp")?;
 

@@ -30,35 +30,38 @@ impl Ray {
 
 #[derive(Clone, Copy, Default)]
 pub struct Interval {
-    begin: f32,
-    end: f32,
+    endpoints: [f32; 2],
 }
 
 impl Interval {
     pub fn new(begin: f32, end: f32) -> Interval {
-        Interval { begin, end }
+        Interval {
+            endpoints: [begin, end],
+        }
     }
 
     pub fn contains(&self, t: f32) -> bool {
-        t >= self.begin && t <= self.end
+        t >= self.endpoints[0] && t <= self.endpoints[1]
     }
 
     pub fn clamp(&self, t: f32) -> f32 {
-        if t > self.end {
-            return self.end;
-        } else if t < self.begin {
-            return self.begin;
+        if t > self.endpoints[1] {
+            return self.endpoints[1];
+        } else if t < self.endpoints[0] {
+            return self.endpoints[0];
         }
 
         t
     }
+
+    pub fn get_val(&self, i: usize) -> f32 {
+        return self.endpoints[i as usize];
+    }
 }
 
 pub const EMPTY: Interval = Interval {
-    begin: f32::INFINITY,
-    end: f32::NEG_INFINITY,
+    endpoints: [f32::INFINITY, f32::NEG_INFINITY],
 };
 pub const ANY: Interval = Interval {
-    begin: f32::NEG_INFINITY,
-    end: f32::INFINITY,
+    endpoints: [f32::NEG_INFINITY, f32::INFINITY],
 };
