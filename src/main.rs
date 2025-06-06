@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, time::SystemTime};
 
 use bmp::BmpCanvas;
 use material::{Material, MaterialType};
@@ -17,7 +17,7 @@ mod triangle_mesh;
 mod vec3;
 
 fn main() -> Result<(), io::Error> {
-    let width: u32 = 2560;
+    let width: u32 = 1280;
     let aspect_ratio = 16.0 / 9.0;
     let height: u32 = (width as f32 / aspect_ratio) as u32;
 
@@ -121,7 +121,14 @@ fn main() -> Result<(), io::Error> {
 
     let raytracer = RayTracer::new(&bmp_canvas, 2.0, 1.0);
 
-    raytracer.draw(&mut bmp_canvas, &scene, 25, 20);
+    let start_time = SystemTime::now();
+
+    raytracer.draw(&mut bmp_canvas, &scene, 5, 10);
+
+    println!(
+        "rendered in {} ms",
+        start_time.elapsed().unwrap().as_millis()
+    );
 
     bmp_canvas.save_image("examples/test.bmp")?;
 

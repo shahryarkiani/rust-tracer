@@ -1,3 +1,5 @@
+use core::f32;
+
 use crate::{
     bbox::Bbox,
     hittable::{HitInfo, Hittable},
@@ -10,17 +12,43 @@ pub struct TriangleMesh {
     indices: Vec<u32>,
     vertices: Vec<Point3>,
     normals: Vec<Vec3>,
-    bboxes: Vec<Bbox>,
     material: Material,
 }
 
 #[derive(Default)]
 pub struct Scene {
     meshes: Vec<TriangleMesh>,
+    nodes: Vec<Bbox>,
 }
 
 impl Scene {
     pub fn add_mesh(&mut self, mesh: TriangleMesh) {
+        let mut min_x: f32 = f32::INFINITY;
+        let mut min_y: f32 = f32::INFINITY;
+        let mut min_z: f32 = f32::INFINITY;
+
+        let mut max_x: f32 = f32::NEG_INFINITY;
+        let mut max_y: f32 = f32::NEG_INFINITY;
+        let mut max_z: f32 = f32::NEG_INFINITY;
+
+        for vertex in &mesh.vertices {
+            min_x = f32::min(min_x, vertex.x);
+            max_x = f32::max(max_x, vertex.x);
+
+            min_y = f32::min(min_y, vertex.y);
+            max_y = f32::max(max_y, vertex.y);
+
+            min_z = f32::min(min_z, vertex.z);
+            max_z = f32::max(max_z, vertex.z);
+        }
+
+        let epsilon: f32 = 0.0001;
+
+        self.nodes.push(Bbox::new(
+            Interval::new(min_x - epsilon, max_x + epsilon),
+            Interval::new(min_y - epsilon, max_y + epsilon),
+            Interval::new(min_z - epsilon, max_z + epsilon),
+        ));
         self.meshes.push(mesh);
     }
 }
@@ -28,9 +56,14 @@ impl Scene {
 impl Hittable for Scene {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
         hit_info_out.t = f32::INFINITY;
+        let mut i: usize = 0;
 
-        for mesh in &self.meshes {
-            mesh.hit(ray, interval, hit_info_out);
+        while i < self.meshes.len() {
+            if self.nodes[i].intersects(ray) {
+                self.meshes[i].hit(ray, interval, hit_info_out);
+            }
+
+            i += 1;
         }
 
         if hit_info_out.t < f32::INFINITY {
@@ -47,7 +80,6 @@ impl TriangleMesh {
             indices: Vec::new(),
             vertices: Vec::new(),
             normals: Vec::new(),
-            bboxes: Vec::new(),
             material: material,
         }
     }
@@ -74,7 +106,6 @@ impl TriangleMesh {
 impl Hittable for TriangleMesh {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
         let mut i: usize = 0;
-
         let mut hit = false;
 
         while i < self.indices.len() {

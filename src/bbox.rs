@@ -26,8 +26,8 @@ impl Bbox {
             f32::max(a.y, f32::max(b.y, c.y)),
         );
         bbox.axis_intervals[2] = Interval::new(
-            f32::min(a.x, f32::min(b.x, c.x)),
-            f32::max(a.x, f32::max(b.x, c.x)),
+            f32::min(a.z, f32::min(b.z, c.z)),
+            f32::max(a.z, f32::max(b.z, c.z)),
         );
         bbox
     }
@@ -40,11 +40,10 @@ impl Bbox {
         let mut tmin: f32 = 0.0;
         let mut tmax = f32::INFINITY;
 
-        for i in 0..=2usize {
+        for i in 0..=2 {
             let dir_inv = 1.0 / ray.dir().axis_val(i);
 
-            let sign = f32::is_sign_positive(dir_inv);
-
+            let sign = f32::is_sign_negative(dir_inv); // same as signbit in C++
             let bmin = self.axis_interval(i).get_val(sign as usize);
             let bmax = self.axis_interval(i).get_val(!sign as usize);
 
@@ -55,6 +54,6 @@ impl Bbox {
             tmax = f32::min(tmax, dmax);
         }
 
-        return tmax > tmax;
+        tmax > tmin
     }
 }
