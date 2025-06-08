@@ -1,3 +1,5 @@
+#![feature(portable_simd)]
+
 use std::{io, time::SystemTime};
 
 use bmp::BmpCanvas;
@@ -8,6 +10,7 @@ use vec3::Vec3;
 
 mod bbox;
 mod bmp;
+mod bvh;
 mod canvas;
 mod hittable;
 mod material;
@@ -123,7 +126,7 @@ fn main() -> Result<(), io::Error> {
 
     let start_time = SystemTime::now();
 
-    raytracer.draw(&mut bmp_canvas, &scene, 100, 20);
+    raytracer.draw(&mut bmp_canvas, &scene, 15, 20);
 
     println!(
         "rendered in {} ms",

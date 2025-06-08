@@ -1,4 +1,11 @@
 use core::f32;
+use std::{
+    arch::x86_64::{
+        __m128, _mm_cmple_ps, _mm_max_ps, _mm_min_ps, _mm_movemask_ps, _mm_mul_ps, _mm_set1_ps,
+        _mm_sub_ps,
+    },
+    simd,
+};
 
 use crate::{
     bbox::Bbox,
@@ -19,6 +26,7 @@ pub struct TriangleMesh {
 pub struct Scene {
     meshes: Vec<TriangleMesh>,
     nodes: Vec<Bbox>,
+    bounds: [[simd::f32x4; 2]; 3],
 }
 
 impl Scene {
@@ -50,6 +58,56 @@ impl Scene {
             Interval::new(min_z - epsilon, max_z + epsilon),
         ));
         self.meshes.push(mesh);
+
+        // build simd data
+        if self.meshes.len() == 4 {
+            for i in 0..4 {
+                self.bounds[0][0].as_mut_array()[i] = self.nodes[i].axis_interval(0).get_val(0);
+                self.bounds[0][1].as_mut_array()[i] = self.nodes[i].axis_interval(0).get_val(1);
+                self.bounds[1][0].as_mut_array()[i] = self.nodes[i].axis_interval(1).get_val(0);
+                self.bounds[1][1].as_mut_array()[i] = self.nodes[i].axis_interval(1).get_val(1);
+                self.bounds[2][0].as_mut_array()[i] = self.nodes[i].axis_interval(2).get_val(0);
+                self.bounds[2][1].as_mut_array()[i] = self.nodes[i].axis_interval(2).get_val(1);
+            }
+        }
+    }
+
+    fn simd_intersect(&self, ray: Ray) -> i32 {
+        unsafe {
+            let origin: [__m128; 3] = [
+                _mm_set1_ps(ray.origin().axis_val(0)),
+                _mm_set1_ps(ray.origin().axis_val(1)),
+                _mm_set1_ps(ray.origin().axis_val(2)),
+            ];
+            let dir_inv: [__m128; 3] = [
+                _mm_set1_ps(1.0 / ray.dir().axis_val(0)),
+                _mm_set1_ps(1.0 / ray.dir().axis_val(1)),
+                _mm_set1_ps(1.0 / ray.dir().axis_val(2)),
+            ];
+
+            let signs: [bool; 3] = [
+                ray.dir().axis_val(0).is_sign_negative(),
+                ray.dir().axis_val(1).is_sign_negative(),
+                ray.dir().axis_val(2).is_sign_negative(),
+            ];
+
+            let mut tmin = _mm_set1_ps(0.0);
+            let mut tmax = _mm_set1_ps(f32::INFINITY);
+
+            for i in 0..=2 {
+                let bmin: __m128 = self.bounds[i][signs[i] as usize].into();
+                let bmax: __m128 = self.bounds[i][!signs[i] as usize].into();
+
+                let dmin = _mm_mul_ps(_mm_sub_ps(bmin, origin[i]), dir_inv[i]);
+                let dmax = _mm_mul_ps(_mm_sub_ps(bmax, origin[i]), dir_inv[i]);
+
+                tmin = _mm_max_ps(tmin, dmin);
+                tmax = _mm_min_ps(tmax, dmax);
+            }
+
+            let result = _mm_cmple_ps(tmin, tmax);
+            return _mm_movemask_ps(result);
+        }
     }
 }
 
@@ -58,13 +116,32 @@ impl Hittable for Scene {
         hit_info_out.t = f32::INFINITY;
         let mut i: usize = 0;
 
-        while i < self.meshes.len() {
-            if self.nodes[i].intersects(ray) {
-                self.meshes[i].hit(ray, interval, hit_info_out);
-            }
+        let intersections = self.simd_intersect(ray);
 
-            i += 1;
+        if intersections & 1 != 0 {
+            self.meshes[0].hit(ray, interval, hit_info_out);
         }
+        if intersections & 2 != 0 {
+            self.meshes[1].hit(ray, interval, hit_info_out);
+        }
+        if intersections & 4 != 0 {
+            self.meshes[2].hit(ray, interval, hit_info_out);
+        }
+        if intersections & 8 != 0 {
+            self.meshes[3].hit(ray, interval, hit_info_out);
+        }
+
+        if hit_info_out.t < f32::INFINITY {
+            return true;
+        }
+
+        // while i < self.meshes.len() {
+        //     if self.nodes[i].intersects(ray) {
+        //         self.meshes[i].hit(ray, interval, hit_info_out);
+        //     }
+
+        //     i += 1;
+        // }
 
         if hit_info_out.t < f32::INFINITY {
             return true;
