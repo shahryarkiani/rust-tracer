@@ -16,15 +16,22 @@ impl Material {
     ) -> bool {
         return match self.material_type {
             MaterialType::Lambertian => {
-                self.scatter_lambertian(ray, hit_info, attenuation_out, scatter_out)
+                self.scatter_lambertian(hit_info, attenuation_out, scatter_out)
             }
             MaterialType::Metal => self.scatter_metal(ray, hit_info, attenuation_out, scatter_out),
+            MaterialType::Emissive => self.scatter_emissive(),
+        };
+    }
+
+    pub fn emission(&self) -> Vec3 {
+        return match self.material_type {
+            MaterialType::Emissive => self.albedo,
+            _ => Vec3::new(0., 0., 0.),
         };
     }
 
     fn scatter_lambertian(
         &self,
-        ray: Ray,
         hit_info: &HitInfo,
         attenuation_out: &mut Vec3,
         scatter_out: &mut Ray,
@@ -47,6 +54,10 @@ impl Material {
         *attenuation_out = self.albedo;
         true
     }
+
+    fn scatter_emissive(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Default, Clone, Copy)]
@@ -54,4 +65,5 @@ pub enum MaterialType {
     Lambertian,
     #[default]
     Metal,
+    Emissive,
 }

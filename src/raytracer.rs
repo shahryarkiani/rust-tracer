@@ -87,6 +87,8 @@ fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
 
             let mut attenuation = Vec3::default();
 
+            let emitted = material.emission();
+
             if material.scatter(
                 scattered_ray,
                 &hit_info,
@@ -95,7 +97,7 @@ fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
             ) {
                 total_attenuation = total_attenuation * attenuation;
             } else {
-                return Vec3::new(0., 0., 0.);
+                return emitted * total_attenuation;
             }
         } else {
             let dir_u = scattered_ray.dir() / scattered_ray.dir().magnitude();

@@ -17,7 +17,7 @@ mod triangle_mesh;
 mod vec3;
 
 fn main() -> Result<(), io::Error> {
-    let width: u32 = 1280;
+    let width: u32 = 2560;
     let aspect_ratio = 16.0 / 9.0;
     let height: u32 = (width as f32 / aspect_ratio) as u32;
 
@@ -90,8 +90,8 @@ fn main() -> Result<(), io::Error> {
     scene.add_mesh(floor);
 
     let mut tinybox = TriangleMesh::new(Material {
-        material_type: MaterialType::Lambertian,
-        albedo: Vec3::new(1.0, 0.4, 0.5),
+        material_type: MaterialType::Emissive,
+        albedo: Vec3::new(4.0, 1.0, 1.0),
     });
 
     tinybox.add_vertex(Vec3::new(0.3, -0.5, -0.65));
@@ -123,7 +123,7 @@ fn main() -> Result<(), io::Error> {
 
     let start_time = SystemTime::now();
 
-    raytracer.draw(&mut bmp_canvas, &scene, 5, 10);
+    raytracer.draw(&mut bmp_canvas, &scene, 100, 20);
 
     println!(
         "rendered in {} ms",
