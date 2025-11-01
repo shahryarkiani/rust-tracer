@@ -134,10 +134,6 @@ impl Mul<Vec3> for Vec3 {
 impl Div<f32> for Vec3 {
     type Output = Vec3;
     fn div(self, c: f32) -> Vec3 {
-        Vec3 {
-            x: self.x / c,
-            y: self.y / c,
-            z: self.z / c,
-        }
+       return self * (1.0/c);
     }
 }
