@@ -114,7 +114,6 @@ impl Scene {
 impl Hittable for Scene {
     fn hit(&self, ray: Ray, interval: Interval, hit_info_out: &mut HitInfo) -> bool {
         hit_info_out.t = f32::INFINITY;
-        let mut i: usize = 0;
 
         let intersections = self.simd_intersect(ray);
 
