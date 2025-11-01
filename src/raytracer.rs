@@ -45,7 +45,6 @@ impl RayTracer {
                 let base_dir = viewport_top_left + (x_delta * x as f32) + (y_delta * y as f32);
 
                 let mut color = Vec3::new(0., 0., 0.);
-
                 for _ in 0..samples {
                     let x_offset = rand::rng().random_range(-0.5..0.5);
                     let y_offset = rand::rng().random_range(-0.5..0.5);
@@ -70,10 +69,6 @@ impl RayTracer {
 }
 
 fn ray_color(ray: Ray, scene: &Scene, rec_depth: i16) -> Vec3 {
-    if rec_depth == 0 {
-        return Vec3::new(0.0, 0.0, 0.0);
-    }
-
     let hit_interval = Interval::new(0.001, f32::INFINITY);
 
     let mut scattered_ray = ray;
