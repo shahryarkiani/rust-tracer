@@ -10,6 +10,8 @@ To run use `cargo run --release`
 
 Scene definition in main.rs
 
+Outputs images in .bmp format \(Implemented in src/bmp.rs\)
+
 # TODO
   - [ ] Read scene from text file 
   - [ ] Multithreaded rendering
