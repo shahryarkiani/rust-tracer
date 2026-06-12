@@ -1,11 +1,5 @@
 use core::f32;
-use std::{
-    arch::x86_64::{
-        __m128, _mm_cmple_ps, _mm_max_ps, _mm_min_ps, _mm_movemask_ps, _mm_mul_ps, _mm_set1_ps,
-        _mm_sub_ps,
-    },
-    simd,
-};
+use std::simd::{self, cmp::SimdPartialOrd, f32x4, num::SimdFloat};
 
 use crate::{
     bbox::Bbox,
@@ -26,7 +20,7 @@ pub struct TriangleMesh {
 pub struct Scene {
     meshes: Vec<TriangleMesh>,
     nodes: Vec<Bbox>,
-    bounds: [[simd::f32x4; 2]; 3],
+    bounds: [[f32x4; 2]; 3],
 }
 
 impl Scene {
@@ -73,16 +67,15 @@ impl Scene {
     }
 
     fn simd_intersect(&self, ray: Ray) -> i32 {
-        unsafe {
-            let origin: [__m128; 3] = [
-                _mm_set1_ps(ray.origin().axis_val(0)),
-                _mm_set1_ps(ray.origin().axis_val(1)),
-                _mm_set1_ps(ray.origin().axis_val(2)),
+            let origin: [f32x4; 3] = [
+                f32x4::splat(ray.origin().axis_val(0)),
+                f32x4::splat(ray.origin().axis_val(1)),
+                f32x4::splat(ray.origin().axis_val(2)),
             ];
-            let dir_inv: [__m128; 3] = [
-                _mm_set1_ps(1.0 / ray.dir().axis_val(0)),
-                _mm_set1_ps(1.0 / ray.dir().axis_val(1)),
-                _mm_set1_ps(1.0 / ray.dir().axis_val(2)),
+            let dir_inv: [f32x4; 3] = [
+                f32x4::splat(1.0 / ray.dir().axis_val(0)),
+                f32x4::splat(1.0 / ray.dir().axis_val(1)),
+                f32x4::splat(1.0 / ray.dir().axis_val(2)),
             ];
 
             let signs: [bool; 3] = [
@@ -91,23 +84,22 @@ impl Scene {
                 ray.dir().axis_val(2).is_sign_negative(),
             ];
 
-            let mut tmin = _mm_set1_ps(0.0);
-            let mut tmax = _mm_set1_ps(f32::INFINITY);
+            let mut tmin = f32x4::splat(0.0);
+            let mut tmax = f32x4::splat(f32::INFINITY);
 
             for i in 0..=2 {
-                let bmin: __m128 = self.bounds[i][signs[i] as usize].into();
-                let bmax: __m128 = self.bounds[i][!signs[i] as usize].into();
+                let bmin: f32x4 = self.bounds[i][signs[i] as usize];
+                let bmax: f32x4 = self.bounds[i][!signs[i] as usize];
 
-                let dmin = _mm_mul_ps(_mm_sub_ps(bmin, origin[i]), dir_inv[i]);
-                let dmax = _mm_mul_ps(_mm_sub_ps(bmax, origin[i]), dir_inv[i]);
-
-                tmin = _mm_max_ps(tmin, dmin);
-                tmax = _mm_min_ps(tmax, dmax);
+                let dmin: f32x4 = (bmin - origin[i]) * dir_inv[i];
+                let dmax: f32x4 = (bmax - origin[i]) * dir_inv[i];
+                
+                tmin = f32x4::simd_max(tmin, dmin);
+                tmax = f32x4::simd_min(tmax, dmax);
             }
 
-            let result = _mm_cmple_ps(tmin, tmax);
-            return _mm_movemask_ps(result);
-        }
+            let result = f32x4::simd_le(tmin, tmax);
+            return result.to_bitmask() as i32;
     }
 }
 
