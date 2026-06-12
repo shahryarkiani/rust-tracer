@@ -1,9 +1,16 @@
 use crate::{hittable::HitInfo, ray::Ray, vec3::Vec3};
 
-#[derive(Default, Clone, Copy)]
-pub struct Material {
-    pub material_type: MaterialType,
-    pub albedo: Vec3,
+#[derive(Clone, Copy, Debug)]
+pub enum Material {
+    Lambertian { albedo: Vec3},
+    Metal { albedo: Vec3 },
+    Emissive { emission: Vec3 }
+}
+
+impl Default for Material {
+    fn default() -> Material {
+        Material::Metal { albedo: Vec3::default() }
+    }
 }
 
 impl Material {
@@ -14,56 +21,29 @@ impl Material {
         attenuation_out: &mut Vec3,
         scatter_out: &mut Ray,
     ) -> bool {
-        return match self.material_type {
-            MaterialType::Lambertian => {
-                self.scatter_lambertian(hit_info, attenuation_out, scatter_out)
+        match self {
+            Material::Lambertian { albedo } => {
+                let bounce_dir = hit_info.normal + Vec3::random_unit();
+                *scatter_out = Ray::new(hit_info.point, bounce_dir);
+                *attenuation_out = *albedo;
+                true
             }
-            MaterialType::Metal => self.scatter_metal(ray, hit_info, attenuation_out, scatter_out),
-            MaterialType::Emissive => self.scatter_emissive(),
-        };
+            Material::Metal { albedo } => {
+                let reflect_dir = ray.dir() - 2.0 * ray.dir().dot(hit_info.normal) * hit_info.normal;
+                *scatter_out = Ray::new(hit_info.point, reflect_dir);
+                *attenuation_out = *albedo;                
+                true
+            }
+            Material::Emissive { emission: _ } => {
+                false
+            }
+        }
     }
 
     pub fn emission(&self) -> Vec3 {
-        return match self.material_type {
-            MaterialType::Emissive => self.albedo,
-            _ => Vec3::new(0., 0., 0.),
-        };
+        match self {
+            Material::Emissive { emission } => *emission,
+            _ => Vec3::new(0.0, 0.0, 0.0),
+        }
     }
-
-    fn scatter_lambertian(
-        &self,
-        hit_info: &HitInfo,
-        attenuation_out: &mut Vec3,
-        scatter_out: &mut Ray,
-    ) -> bool {
-        let bounce_dir = hit_info.normal + Vec3::random_unit();
-        *scatter_out = Ray::new(hit_info.point, bounce_dir);
-        *attenuation_out = self.albedo;
-        true
-    }
-
-    fn scatter_metal(
-        &self,
-        ray: Ray,
-        hit_info: &HitInfo,
-        attenuation_out: &mut Vec3,
-        scatter_out: &mut Ray,
-    ) -> bool {
-        let reflect_dir = ray.dir() - 2.0 * ray.dir().dot(hit_info.normal) * hit_info.normal;
-        *scatter_out = Ray::new(hit_info.point, reflect_dir);
-        *attenuation_out = self.albedo;
-        true
-    }
-
-    fn scatter_emissive(&self) -> bool {
-        false
-    }
-}
-
-#[derive(Default, Clone, Copy)]
-pub enum MaterialType {
-    Lambertian,
-    #[default]
-    Metal,
-    Emissive,
 }

@@ -3,7 +3,7 @@
 use std::{io, time::SystemTime};
 
 use bmp::BmpCanvas;
-use material::{Material, MaterialType};
+use material::{Material};
 use raytracer::RayTracer;
 use triangle_mesh::{Scene, TriangleMesh};
 use vec3::Vec3;
@@ -27,8 +27,7 @@ fn main() -> Result<(), io::Error> {
     let mut bmp_canvas = BmpCanvas::new(width, height);
     let mut scene = Scene::default();
 
-    let mut mesh = TriangleMesh::new(Material {
-        material_type: MaterialType::Lambertian,
+    let mut mesh = TriangleMesh::new(Material::Lambertian {
         albedo: Vec3::new(0.3, 0.4, 0.5),
     });
 
@@ -55,9 +54,8 @@ fn main() -> Result<(), io::Error> {
 
     scene.add_mesh(mesh);
 
-    let mut mirror = TriangleMesh::new(Material {
-        material_type: MaterialType::Metal,
-        albedo: Vec3::new(0.9, 0.8, 0.85),
+    let mut mirror = TriangleMesh::new(Material::Metal { 
+        albedo: Vec3::new(0.9, 0.8, 0.85)
     });
 
     mirror.add_vertex(Vec3::new(-1.5, -0.5, -1.5));
@@ -77,9 +75,8 @@ fn main() -> Result<(), io::Error> {
 
     scene.add_mesh(mirror);
 
-    let mut floor = TriangleMesh::new(Material {
-        material_type: MaterialType::Lambertian,
-        albedo: Vec3::new(0.7, 0.8, 0.5),
+    let mut floor = TriangleMesh::new(Material::Lambertian {
+        albedo: Vec3::new(0.7, 0.8, 0.5)
     });
 
     floor.add_vertex(Vec3::new(-555., -0.51, 5.)); // close left 0 
@@ -92,9 +89,8 @@ fn main() -> Result<(), io::Error> {
 
     scene.add_mesh(floor);
 
-    let mut tinybox = TriangleMesh::new(Material {
-        material_type: MaterialType::Emissive,
-        albedo: Vec3::new(4.0, 1.0, 1.0),
+    let mut tinybox = TriangleMesh::new(Material::Emissive {
+        emission: Vec3::new(4.0, 1.0, 1.0)
     });
 
     tinybox.add_vertex(Vec3::new(0.3, -0.5, -0.65));
