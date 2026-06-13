@@ -1,5 +1,5 @@
 use core::f32;
-use std::simd::{self, Select, cmp::SimdPartialOrd, f32x4, num::SimdFloat};
+use std::simd::{Select, cmp::SimdPartialOrd, f32x4};
 
 use crate::{
     bbox::Bbox,
