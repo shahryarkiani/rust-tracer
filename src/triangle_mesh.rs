@@ -1,5 +1,5 @@
 use core::f32;
-use std::simd::{self, cmp::SimdPartialOrd, f32x4, num::SimdFloat};
+use std::simd::{self, Select, cmp::SimdPartialOrd, f32x4, num::SimdFloat};
 
 use crate::{
     bbox::Bbox,
@@ -94,8 +94,8 @@ impl Scene {
                 let dmin: f32x4 = (bmin - origin[i]) * dir_inv[i];
                 let dmax: f32x4 = (bmax - origin[i]) * dir_inv[i];
                 
-                tmin = f32x4::simd_max(tmin, dmin);
-                tmax = f32x4::simd_min(tmax, dmax);
+                tmin = tmin.simd_gt(dmin).select(tmin, dmin);
+                tmax = tmax.simd_lt(dmax).select(tmax, dmax);
             }
 
             let result = f32x4::simd_le(tmin, tmax);
